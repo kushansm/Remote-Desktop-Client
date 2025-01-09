@@ -1,0 +1,19 @@
+# intelij IDEA
+.idea
+*.iml
+.DS_Store
+
+# VSCode
+.vscode/
+
+#Maven
+target
+!taret/abc
+
+# Intelij IDEA JAva Build System
+out/
+
+#Others
+node_modules/
+dist/
+lib/
