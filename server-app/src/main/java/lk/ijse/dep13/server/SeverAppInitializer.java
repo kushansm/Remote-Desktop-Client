@@ -1,6 +1,6 @@
 package lk.ijse.dep13.server;
 
-//import com.github.sarxos.webcam.Webcam;
+import com.github.sarxos.webcam.Webcam;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
