@@ -14,6 +14,8 @@ public class SeverAppInitializer {
 
         ServerSocket serverSocket = new ServerSocket(9090);
         System.out.println("Server started on port 9090");
+
+
         while (true) {
             System.out.println("Waiting for connection...");
             Socket localSocket = serverSocket.accept();
