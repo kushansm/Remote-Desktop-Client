@@ -2,6 +2,7 @@ package lk.ijse.dep13.server;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.event.InputEvent;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.ServerSocket;
@@ -17,14 +18,16 @@ public class SeverAppInitializer {
             System.out.println("Waiting for connection...");
             Socket localSocket = serverSocket.accept();
             System.out.println("Accepted connection from " + localSocket.getRemoteSocketAddress());
-            new Thread(()->{
+
+            // Screen capture thread
+            new Thread(() -> {
                 try {
                     OutputStream os = localSocket.getOutputStream();
                     BufferedOutputStream bos = new BufferedOutputStream(os);
                     ObjectOutputStream oos = new ObjectOutputStream(bos);
 
+                    Robot robot = new Robot();
                     while (true) {
-                        Robot robot = new Robot();
                         BufferedImage screen = robot
                                 .createScreenCapture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()));
                         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -33,22 +36,60 @@ public class SeverAppInitializer {
                         oos.flush();
                         Thread.sleep(1000 / 27);
                     }
-                }catch (Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }).start();
-            new Thread(()->{
+
+            // Mouse input thread
+            new Thread(() -> {
                 try {
                     InputStream is = localSocket.getInputStream();
                     BufferedInputStream bis = new BufferedInputStream(is);
                     ObjectInputStream ois = new ObjectInputStream(bis);
 
                     Robot robot = new Robot();
-                    while (true){
+                    while (true) {
                         Point coordinates = (Point) ois.readObject();
+                        int button = ois.readInt(); // Read the mouse button pressed
                         robot.mouseMove(coordinates.x, coordinates.y);
+
+                        if (button == 1) {
+                            robot.mousePress(InputEvent.BUTTON1_DOWN_MASK); // Left-click
+                            robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
+                        } else if (button == 2) {
+                            robot.mousePress(InputEvent.BUTTON2_DOWN_MASK); // Middle-click
+                            robot.mouseRelease(InputEvent.BUTTON2_DOWN_MASK);
+                        } else if (button == 3) {
+                            robot.mousePress(InputEvent.BUTTON3_DOWN_MASK); // Right-click
+                            robot.mouseRelease(InputEvent.BUTTON3_DOWN_MASK);
+                        }
                     }
-                }catch (Exception e){
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }).start();
+
+            // Keyboard input thread
+            new Thread(() -> {
+                try {
+                    InputStream is = localSocket.getInputStream();
+                    BufferedInputStream bis = new BufferedInputStream(is);
+                    ObjectInputStream ois = new ObjectInputStream(bis);
+
+                    Robot robot = new Robot();
+                    while (true) {
+                        int keyCode = ois.readInt(); // Read the key code
+                        boolean isPress = ois.readBoolean(); // Read whether it's a press or release
+
+                        if (isPress) {
+                            robot.keyPress(keyCode);
+                        } else {
+                            robot.keyRelease(keyCode);
+                        }
+                    }
+
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }).start();
