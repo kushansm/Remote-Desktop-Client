@@ -7,7 +7,7 @@ A **Remote Desktop Client** enables users to access and control a remote compute
 - Kushan Dileep
 
 ### Version
-**0.1.0**
+**0.2.0**
 
 ### License
 Copyright (c) 2025 DEP 13.All Right Reserved.
