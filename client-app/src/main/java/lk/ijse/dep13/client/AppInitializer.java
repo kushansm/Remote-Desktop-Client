@@ -1,11 +1,9 @@
 package lk.ijse.dep13.client;
 
-
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-
 import java.io.IOException;
 
 public class AppInitializer extends Application {
