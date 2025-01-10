@@ -1,9 +1,9 @@
 package lk.ijse.dep13.client;
 
-
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -16,9 +16,15 @@ public class AppInitializer extends Application {
 
     @Override
     public void start(Stage primaryStage) throws IOException {
-        primaryStage.setScene(new Scene(FXMLLoader.load(getClass().getResource("/scene/MainScene.fxml"))));
+        Pane root = FXMLLoader.load(getClass().getResource("/scene/MainScene.fxml"));
+
+        // Set a light background color for the root pane
+        root.setStyle("-fx-background-color: #f8f9fa;"); // Light grayish white background
+
+        Scene scene = new Scene(root);
+        primaryStage.setScene(scene);
         primaryStage.setTitle("Remote Desktop Client");
-        primaryStage.show();
         primaryStage.centerOnScreen();
+        primaryStage.show();
     }
 }
