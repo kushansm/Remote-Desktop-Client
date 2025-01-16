@@ -17,6 +17,7 @@ public class MainSceneController {
     public Button sendBtn;
 
     private PrintWriter writer;
+    private int typingIndex = -1; // Keeps track of the "Typing" message index
 
     public void initialize() throws IOException {
         String ipAddress = "192.168.155.118";
@@ -28,12 +29,42 @@ public class MainSceneController {
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));
         writer = new PrintWriter(os, true);
 
+        // Listen for live typing updates
+        typeTxtFld.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (writer != null) {
+                writer.println("LIVE_TYPING: " + newValue);
+                writer.flush();
+            }
+        });
+
         new Thread(() -> {
             try {
-                while (true) {
-                    String serverMessage = reader.readLine();
-                    if (serverMessage != null) {
-                        Platform.runLater(() -> messageListView.getItems().add(serverMessage));
+                String serverMessage;
+                while ((serverMessage = reader.readLine()) != null) {
+                    if (serverMessage.startsWith("LIVE_TYPING: ")) {
+                        // Handle live typing updates
+                        String liveMessage = serverMessage.replace("LIVE_TYPING: ", "");
+                        Platform.runLater(() -> {
+                            if (typingIndex == -1) {
+                                // Add "Typing" message if it doesn't exist
+                                typingIndex = messageListView.getItems().size();
+                                messageListView.getItems().add(liveMessage);
+                            } else {
+                                // Update the existing "Typing" message
+                                messageListView.getItems().set(typingIndex,liveMessage);
+                            }
+                        });
+                    } else {
+                        // Handle regular messages
+                        String finalServerMessage = serverMessage;
+                        Platform.runLater(() -> {
+                            if (typingIndex != -1) {
+                                // Remove the "Typing" message
+                                messageListView.getItems().remove(typingIndex);
+                                typingIndex = -1;
+                            }
+                            messageListView.getItems().add(finalServerMessage);
+                        });
                     }
                 }
             } catch (IOException e) {
@@ -45,9 +76,15 @@ public class MainSceneController {
     public void sendBtnOnAction(ActionEvent actionEvent) {
         String message = typeTxtFld.getText().trim();
         if (!message.isEmpty()) {
-            writer.println("Client " + message);
+            writer.println("Client: " + message);
             writer.flush();
-            Platform.runLater(() -> messageListView.getItems().add("You: " + message));
+
+            // Remove the typing indicator and add the finalized message
+            if (typingIndex != -1) {
+                messageListView.getItems().remove(typingIndex);
+                typingIndex = -1;
+            }
+            messageListView.getItems().add("You: " + message);
             typeTxtFld.clear();
         }
     }

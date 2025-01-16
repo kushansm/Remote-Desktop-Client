@@ -1,6 +1,8 @@
 package lk.ijse.dep13.skype.server.controller;
 
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
@@ -14,6 +16,7 @@ public class MainSceneController {
     public TextField typeTxtFld;
 
     private PrintWriter writer;
+    private int typingIndex = -1; // Keeps track of the "Typing" message index
 
     public void initialize() throws IOException {
         ServerSocket serverSocket = new ServerSocket(5050);
@@ -30,12 +33,43 @@ public class MainSceneController {
                 BufferedReader reader = new BufferedReader(new InputStreamReader(is));
                 writer = new PrintWriter(os, true);
 
+                // Listen for live typing updates
+                typeTxtFld.textProperty().addListener((observable, oldValue, newValue) -> {
+                    if (writer != null) {
+                        writer.println("LIVE_TYPING: " + newValue);
+                        writer.flush();
+                    }
+                });
+
                 new Thread(() -> {
                     try {
                         String clientMessage;
                         while ((clientMessage = reader.readLine()) != null) {
-                            String finalClientMessage = clientMessage;
-                            Platform.runLater(() -> messageListView.getItems().add( finalClientMessage)); // Display message in ListView
+                            if (clientMessage.startsWith("LIVE_TYPING: ")) {
+                                // Handle live typing updates
+                                String liveMessage = clientMessage.replace("LIVE_TYPING: ", "");
+                                Platform.runLater(() -> {
+                                    if (typingIndex == -1) {
+                                        // Add "Typing" message if it doesn't exist
+                                        typingIndex = messageListView.getItems().size();
+                                        messageListView.getItems().add(liveMessage);
+                                    } else {
+                                        // Update the existing "Typing" message
+                                        messageListView.getItems().set(typingIndex, liveMessage);
+                                    }
+                                });
+                            } else {
+                                // Handle regular messages
+                                String finalClientMessage = clientMessage;
+                                Platform.runLater(() -> {
+                                    if (typingIndex != -1) {
+                                        // Remove the "Typing" message
+                                        messageListView.getItems().remove(typingIndex);
+                                        typingIndex = -1;
+                                    }
+                                    messageListView.getItems().add(finalClientMessage);
+                                });
+                            }
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -53,6 +87,12 @@ public class MainSceneController {
         if (!message.isEmpty() && writer != null) {
             writer.println("Server: " + message);
             writer.flush();
+
+            // Remove the typing indicator and add the finalized message
+            if (typingIndex != -1) {
+                messageListView.getItems().remove(typingIndex);
+                typingIndex = -1;
+            }
             messageListView.getItems().add("You: " + message);
             typeTxtFld.clear();
         }
