@@ -8,6 +8,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 
 import java.io.*;
+import java.net.InetAddress;
 import java.net.Socket;
 
 public class MainSceneController {
@@ -76,8 +77,18 @@ public class MainSceneController {
     public void sendBtnOnAction(ActionEvent actionEvent) {
         String message = typeTxtFld.getText().trim();
         if (!message.isEmpty()) {
-            writer.println("Client: " + message);
-            writer.flush();
+            try {
+                // Get the client's hostname
+                String hostname = InetAddress.getLocalHost().getHostName();
+
+                // Send the message with the hostname
+                writer.println(hostname + ": " + message);
+                writer.flush();
+            } catch (Exception e) {
+                e.printStackTrace();
+                writer.println("Unknown Client: " + message); // Fallback in case of an error
+                writer.flush();
+            }
 
             // Remove the typing indicator and add the finalized message
             if (typingIndex != -1) {
@@ -88,4 +99,5 @@ public class MainSceneController {
             typeTxtFld.clear();
         }
     }
+
 }

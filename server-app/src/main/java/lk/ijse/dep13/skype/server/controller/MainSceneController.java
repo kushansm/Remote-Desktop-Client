@@ -7,7 +7,9 @@ import javafx.event.ActionEvent;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 
+
 import java.io.*;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -82,11 +84,22 @@ public class MainSceneController {
         }).start();
     }
 
+
     public void sendBtnOnAction(ActionEvent actionEvent) {
         String message = typeTxtFld.getText().trim();
         if (!message.isEmpty() && writer != null) {
-            writer.println("Server: " + message);
-            writer.flush();
+            try {
+                // Get the server's hostname
+                String serverName = InetAddress.getLocalHost().getHostName();
+
+                // Send the message with the server's hostname
+                writer.println(serverName + ": " + message);
+                writer.flush();
+            } catch (Exception e) {
+                e.printStackTrace();
+                writer.println("Unknown Server: " + message); // Fallback if hostname cannot be retrieved
+                writer.flush();
+            }
 
             // Remove the typing indicator and add the finalized message
             if (typingIndex != -1) {
@@ -97,4 +110,5 @@ public class MainSceneController {
             typeTxtFld.clear();
         }
     }
+
 }
