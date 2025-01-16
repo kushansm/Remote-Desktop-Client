@@ -89,10 +89,8 @@ public class MainSceneController {
         String message = typeTxtFld.getText().trim();
         if (!message.isEmpty() && writer != null) {
             try {
-                // Get the server's hostname
                 String serverName = InetAddress.getLocalHost().getHostName();
 
-                // Send the message with the server's hostname
                 writer.println(serverName + ": " + message);
                 writer.flush();
             } catch (Exception e) {
