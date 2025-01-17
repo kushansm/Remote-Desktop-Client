@@ -36,7 +36,7 @@ public class SeverAppInitializer {
                         ImageIO.write(screen, "jpeg", baos);
                         oos.writeObject(baos.toByteArray());
                         oos.flush();
-                        Thread.sleep(1000 / 27);
+                        Thread.sleep(1000 / 20);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
