@@ -15,7 +15,6 @@ public class SeverAppInitializer {
         ServerSocket serverSocket = new ServerSocket(9090);
         System.out.println("Server started on port 9090");
 
-
         while (true) {
             System.out.println("Waiting for connection...");
             Socket localSocket = serverSocket.accept();
@@ -24,6 +23,9 @@ public class SeverAppInitializer {
             // Screen capture thread
             new Thread(() -> {
                 try {
+                    // Change desktop background to solid light color
+                    Desktop.changeDesktopColor("#D3D3D3"); // Light gray color
+
                     OutputStream os = localSocket.getOutputStream();
                     BufferedOutputStream bos = new BufferedOutputStream(os);
                     ObjectOutputStream oos = new ObjectOutputStream(bos);
@@ -40,6 +42,13 @@ public class SeverAppInitializer {
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
+                } finally {
+                    try {
+                        // Revert desktop background
+                        Desktop.revertDesktop();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             }).start();
 
@@ -95,6 +104,29 @@ public class SeverAppInitializer {
                     e.printStackTrace();
                 }
             }).start();
+        }
+    }
+
+    public static class Desktop {
+
+        public static void changeDesktopColor(String color) throws Exception {
+            if (System.getProperty("os.name").toLowerCase().contains("linux")) {
+                String[] command1 = {"gsettings", "set", "org.gnome.desktop.background", "picture-options", "none"};
+                Runtime.getRuntime().exec(command1).waitFor();
+                String[] command2 = {"gsettings", "set", "org.gnome.desktop.background", "primary-color", color};
+                Runtime.getRuntime().exec(command2).waitFor();
+            } else {
+                throw new UnsupportedOperationException("Unsupported OS");
+            }
+        }
+
+        public static void revertDesktop() throws IOException {
+            if (System.getProperty("os.name").toLowerCase().contains("linux")) {
+                String[] setColor = {"gsettings", "set", "org.gnome.desktop.background", "picture-options", "zoom"};
+                Runtime.getRuntime().exec(setColor);
+            } else {
+                throw new UnsupportedOperationException("Unsupported OS");
+            }
         }
     }
 }
