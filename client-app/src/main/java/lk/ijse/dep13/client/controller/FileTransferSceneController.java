@@ -9,7 +9,7 @@ import javafx.stage.FileChooser;
 import java.io.*;
 import java.net.Socket;
 
-public class MainSceneController {
+public class FileTransferSceneController {
 
     public AnchorPane root;
     public Button btnSend;
@@ -32,8 +32,8 @@ public class MainSceneController {
     }
 
     private void uploadFile(String username, String filePath) {
-        String host = "192.168.8.102";
-        int port = 6060;
+        String host = "192.168.100.245";
+        int port = 8080;
 
         File file = new File(filePath);
         if (!file.exists()) {
@@ -78,5 +78,8 @@ public class MainSceneController {
                 e.printStackTrace();
             }
         }
+    }
+
+    public void txtDragDropOnMouseClicked(MouseEvent mouseEvent) {
     }
 }

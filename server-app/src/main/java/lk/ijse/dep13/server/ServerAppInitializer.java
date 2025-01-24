@@ -13,7 +13,7 @@ public class ServerAppInitializer {
 
         ServerSocket serverSocket;
         try {
-            serverSocket = new ServerSocket(6060);
+            serverSocket = new ServerSocket(8080);
             System.out.println("Server started on port 6060");
         } catch (BindException e) {
             System.out.println("6060 port is already in use");

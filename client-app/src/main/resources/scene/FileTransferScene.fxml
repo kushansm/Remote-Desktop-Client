@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane fx:id="root" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="lk.ijse.dep13.client.controller.FileTransferSceneController">
+    <children>
+        <!-- VBox for layout -->
+        <VBox layoutX="100.0" layoutY="100.0" spacing="20" alignment="CENTER">
+            <!-- Label for file selection instructions -->
+            <Label text="Drag &amp; Drop or Select Path to Upload File"
+                   style="-fx-font-size: 14; -fx-font-weight: bold;"/>
+
+            <!-- Box for drag-and-drop functionality -->
+            <TextArea fx:id="txtDragDrop"
+                      prefHeight="100.0"
+                      prefWidth="400.0"
+                      promptText="Drag your file here"
+                      style="-fx-font-size: 12; -fx-border-color: #000000;"
+                      onMouseClicked="#txtDragDropOnMouseClicked"/>
+
+            <!-- Label showing the selected file path -->
+            <Label fx:id="lblFilePath"
+                   text="Selected file path will appear here"
+                   style="-fx-font-size: 12;"/>
+
+            <!-- Button for custom file selection -->
+            <Button fx:id="btnSend"
+                    mnemonicParsing="false"
+                    onAction="#btnSendOnAction"
+                    text="Select File"
+                    style="-fx-font-size: 14;"/>
+        </VBox>
+    </children>
+</AnchorPane>
